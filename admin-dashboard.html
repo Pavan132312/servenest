@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ServeNest — Admin Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <a class="navbar-brand" href="index.html">Serve<span>Nest</span></a>
+    <div class="navbar-links" id="nav-user"></div>
+  </nav>
+
+  <div class="dashboard">
+    <aside class="sidebar">
+      <div class="sidebar-user">
+        <div class="name">Admin Panel</div>
+        <div class="role">🛡️ Administrator</div>
+      </div>
+      <ul class="sidebar-menu">
+        <li><a href="#" class="active" onclick="showTab('overview')">📊 Overview</a></li>
+        <li><a href="#" onclick="showTab('workers')">🔧 All Workers</a></li>
+        <li><a href="#" onclick="showTab('users')">👥 All Users</a></li>
+        <li><a href="#" onclick="showTab('bookings')">📅 All Bookings</a></li>
+        <li><a href="#" onclick="showTab('jobs')">💼 All Jobs</a></li>
+        <li><a href="#" onclick="logout()" style="color:#ff6b6b">🚪 Logout</a></li>
+      </ul>
+    </aside>
+
+    <main class="dashboard-content">
+
+      <!-- OVERVIEW -->
+      <div id="tab-overview">
+        <div class="page-header">
+          <h2>Dashboard Overview</h2>
+          <p>Platform stats at a glance</p>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Total Workers</div>
+            <div class="stat-value" id="stat-workers">0</div>
+            <div class="stat-sub">Registered</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total Users</div>
+            <div class="stat-value" id="stat-users" style="color:var(--accent)">0</div>
+            <div class="stat-sub">Registered</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total Bookings</div>
+            <div class="stat-value" id="stat-bookings" style="color:var(--warning)">0</div>
+            <div class="stat-sub">All time</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Open Jobs</div>
+            <div class="stat-value" id="stat-jobs" style="color:#8E44AD">0</div>
+            <div class="stat-sub">Posted by users</div>
+          </div>
+        </div>
+
+        <!-- SERVICE BREAKDOWN -->
+        <div class="card" style="margin-bottom:1.5rem">
+          <div style="font-weight:700; margin-bottom:1rem">Workers by Service</div>
+          <div id="service-breakdown" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+        </div>
+
+        <!-- RECENT BOOKINGS -->
+        <div class="card">
+          <div style="font-weight:700; margin-bottom:1rem">Recent Bookings</div>
+          <div id="recent-bookings-admin"></div>
+        </div>
+      </div>
+
+      <!-- ALL WORKERS -->
+      <div id="tab-workers" style="display:none">
+        <div class="page-header">
+          <h2>All Workers</h2>
+          <p>Manage all registered workers on the platform</p>
+        </div>
+        <div class="filter-bar" style="margin-bottom:1rem">
+          <div class="form-group" style="margin:0; flex:1">
+            <input type="text" id="search-workers" placeholder="Search by name or service..." oninput="filterWorkersList()" style="width:100%; padding:8px 12px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-size:14px;">
+          </div>
+          <select id="filter-worker-service" onchange="filterWorkersList()" style="padding:8px 12px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-size:14px;">
+            <option value="">All Services</option>
+            <option>Plumber</option><option>Electrician</option><option>Carpenter</option>
+            <option>Painter</option><option>Cleaning</option><option>AC Repair</option>
+            <option>Mason</option><option>Gardener</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th><th>Service</th><th>Location</th>
+                <th>Price/hr</th><th>Rating</th><th>Status</th><th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="workers-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ALL USERS -->
+      <div id="tab-users" style="display:none">
+        <div class="page-header">
+          <h2>All Users</h2>
+          <p>Manage all registered users on the platform</p>
+        </div>
+        <div class="filter-bar" style="margin-bottom:1rem">
+          <div class="form-group" style="margin:0; flex:1">
+            <input type="text" id="search-users" placeholder="Search by name or email..." oninput="filterUsersList()" style="width:100%; padding:8px 12px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-size:14px;">
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th><th>Email</th><th>Phone</th><th>Location</th><th>Joined</th><th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="users-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ALL BOOKINGS -->
+      <div id="tab-bookings" style="display:none">
+        <div class="page-header">
+          <h2>All Bookings</h2>
+          <p>View all service bookings across the platform</p>
+        </div>
+        <div class="filter-bar" style="margin-bottom:1rem">
+          <select id="filter-booking-status" onchange="filterBookingsList()" style="padding:8px 12px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-size:14px;">
+            <option value="">All Status</option>
+            <option>Confirmed</option><option>Cancelled</option><option>Completed</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>User</th><th>Worker</th><th>Service</th>
+                <th>Date</th><th>Price</th><th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="bookings-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ALL JOBS -->
+      <div id="tab-jobs" style="display:none">
+        <div class="page-header">
+          <h2>All Posted Jobs</h2>
+          <p>Jobs posted by users looking for workers</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Title</th><th>Service</th><th>Posted By</th>
+                <th>Location</th><th>Date</th><th>Applicants</th><th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="jobs-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    window.onload = function () {
+      requireAuth("admin");
+      loadOverview();
+    };
+
+    function showTab(tab) {
+      ["overview","workers","users","bookings","jobs"].forEach(t => {
+        document.getElementById("tab-" + t).style.display = t === tab ? "block" : "none";
+      });
+      document.querySelectorAll(".sidebar-menu a").forEach(a => a.classList.remove("active"));
+      event.target.classList.add("active");
+      if (tab === "workers")  loadWorkersTable();
+      if (tab === "users")    loadUsersTable();
+      if (tab === "bookings") loadBookingsTable();
+      if (tab === "jobs")     loadJobsTable();
+    }
+
+    function loadOverview() {
+      const workers  = getWorkers();
+      const users    = getUsers().filter(u => u.role === "user");
+      const bookings = getBookings();
+      const jobs     = getJobs().filter(j => j.status === "Open");
+
+      document.getElementById("stat-workers").textContent  = workers.length;
+      document.getElementById("stat-users").textContent    = users.length;
+      document.getElementById("stat-bookings").textContent = bookings.length;
+      document.getElementById("stat-jobs").textContent     = jobs.length;
+
+      // Service breakdown
+      const breakdown = {};
+      workers.forEach(w => { breakdown[w.service] = (breakdown[w.service] || 0) + 1; });
+      document.getElementById("service-breakdown").innerHTML = Object.entries(breakdown)
+        .sort((a,b) => b[1] - a[1])
+        .map(([s, c]) => `<span class="badge badge-blue" style="font-size:13px; padding:6px 12px">${s}: ${c}</span>`)
+        .join("");
+
+      // Recent bookings
+      const recent = bookings.slice(-5).reverse();
+      const rb = document.getElementById("recent-bookings-admin");
+      if (!recent.length) {
+        rb.innerHTML = `<div class="empty-state" style="padding:1rem"><p>No bookings yet</p></div>`;
+        return;
+      }
+      rb.innerHTML = `
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>User</th><th>Worker</th><th>Service</th><th>Date</th><th>Status</th></tr></thead>
+            <tbody>${recent.map(b => `
+              <tr>
+                <td>${b.userName}</td>
+                <td>${b.workerName}</td>
+                <td>${b.service}</td>
+                <td>${formatDate(b.date)}</td>
+                <td><span class="badge ${b.status === 'Confirmed' ? 'badge-green' : b.status === 'Cancelled' ? 'badge-red' : 'badge-amber'}">${b.status}</span></td>
+              </tr>`).join("")}
+            </tbody>
+          </table>
+        </div>`;
+    }
+
+    let allWorkers = [];
+    function loadWorkersTable() {
+      allWorkers = getWorkers();
+      renderWorkersTable(allWorkers);
+    }
+
+    function filterWorkersList() {
+      const q       = document.getElementById("search-workers").value.toLowerCase();
+      const service = document.getElementById("filter-worker-service").value;
+      let list      = allWorkers;
+      if (q)       list = list.filter(w => w.name.toLowerCase().includes(q) || w.service.toLowerCase().includes(q));
+      if (service) list = list.filter(w => w.service === service);
+      renderWorkersTable(list);
+    }
+
+    function renderWorkersTable(workers) {
+      document.getElementById("workers-table").innerHTML = workers.length
+        ? workers.map(w => `
+            <tr>
+              <td><div style="font-weight:600">${w.name}</div><div style="font-size:12px;color:var(--text-secondary)">${w.phone || "—"}</div></td>
+              <td><span class="badge badge-blue">${w.service}</span></td>
+              <td>${w.location}</td>
+              <td>₹${w.price}/hr</td>
+              <td>${w.rating > 0 ? "★ " + w.rating.toFixed(1) + " (" + w.reviews + ")" : "New"}</td>
+              <td><span class="badge ${w.available ? 'badge-green' : 'badge-red'}">${w.available ? "Available" : "Busy"}</span></td>
+              <td>
+                <button class="btn btn-sm btn-outline" onclick="window.location.href='worker-profile.html?id=${w.id}'">View</button>
+                <button class="btn btn-sm btn-danger" style="margin-left:4px" onclick="removeWorker(${w.id})">Remove</button>
+              </td>
+            </tr>`).join("")
+        : `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:2rem">No workers found</td></tr>`;
+    }
+
+    function removeWorker(workerId) {
+      if (!confirm("Remove this worker from the platform?")) return;
+      saveWorkers(getWorkers().filter(w => w.id !== workerId));
+      showToast("Worker removed");
+      loadWorkersTable();
+      loadOverview();
+    }
+
+    let allUsers = [];
+    function loadUsersTable() {
+      allUsers = getUsers().filter(u => u.role === "user");
+      renderUsersTable(allUsers);
+    }
+
+    function filterUsersList() {
+      const q  = document.getElementById("search-users").value.toLowerCase();
+      const list = q ? allUsers.filter(u => u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)) : allUsers;
+      renderUsersTable(list);
+    }
+
+    function renderUsersTable(users) {
+      document.getElementById("users-table").innerHTML = users.length
+        ? users.map(u => `
+            <tr>
+              <td><div style="font-weight:600">${u.name}</div></td>
+              <td>${u.email}</td>
+              <td>${u.phone || "—"}</td>
+              <td>${u.location || "—"}</td>
+              <td>${formatDate(u.createdAt)}</td>
+              <td><button class="btn btn-sm btn-danger" onclick="removeUser('${u.id}')">Remove</button></td>
+            </tr>`).join("")
+        : `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:2rem">No users found</td></tr>`;
+    }
+
+    function removeUser(userId) {
+      if (!confirm("Remove this user?")) return;
+      saveUsers(getUsers().filter(u => u.id !== userId));
+      showToast("User removed");
+      loadUsersTable();
+      loadOverview();
+    }
+
+    let allBookings = [];
+    function loadBookingsTable() {
+      allBookings = getBookings();
+      renderBookingsTable(allBookings);
+    }
+
+    function filterBookingsList() {
+      const status = document.getElementById("filter-booking-status").value;
+      const list   = status ? allBookings.filter(b => b.status === status) : allBookings;
+      renderBookingsTable(list);
+    }
+
+    function renderBookingsTable(bookings) {
+      document.getElementById("bookings-table").innerHTML = bookings.length
+        ? bookings.reverse().map(b => `
+            <tr>
+              <td>${b.userName}</td>
+              <td>${b.workerName}</td>
+              <td>${b.service}</td>
+              <td>${formatDate(b.date)}</td>
+              <td>₹${b.price}/hr</td>
+              <td><span class="badge ${b.status === 'Confirmed' ? 'badge-green' : b.status === 'Cancelled' ? 'badge-red' : 'badge-amber'}">${b.status}</span></td>
+            </tr>`).join("")
+        : `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:2rem">No bookings found</td></tr>`;
+    }
+
+    function loadJobsTable() {
+      const jobs = getJobs();
+      document.getElementById("jobs-table").innerHTML = jobs.length
+        ? jobs.reverse().map(j => `
+            <tr>
+              <td><div style="font-weight:600">${j.title}</div><div style="font-size:12px;color:var(--text-secondary)">${j.desc.slice(0,50)}...</div></td>
+              <td><span class="badge badge-blue">${j.service}</span></td>
+              <td>${j.userName}</td>
+              <td>${j.location || "—"}</td>
+              <td>${formatDate(j.date)}</td>
+              <td>${j.applicants.length}</td>
+              <td><span class="badge ${j.status === 'Open' ? 'badge-green' : 'badge-gray'}">${j.status}</span></td>
+            </tr>`).join("")
+        : `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:2rem">No jobs posted yet</td></tr>`;
+    }
+  </script>
+</body>
+</html>

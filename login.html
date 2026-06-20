@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ServeNest — Login / Register</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="auth-page">
+    <div class="auth-card">
+
+      <!-- LOGO -->
+      <div class="auth-logo">
+        <h2>Serve<span>Nest</span></h2>
+        <p>Connect with skilled workers near you</p>
+      </div>
+
+      <!-- LOGIN / REGISTER TABS -->
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('login')">Login</button>
+        <button class="tab-btn" onclick="switchTab('register')">Register</button>
+      </div>
+
+      <!-- ── LOGIN FORM ── -->
+      <div id="login-form">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="login-email" placeholder="Enter your email">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="login-password" placeholder="Enter your password">
+        </div>
+        <button class="btn btn-primary" style="width:100%; margin-top:0.5rem" onclick="handleLogin()">
+          Login →
+        </button>
+
+        <div style="text-align:center; margin-top:1.25rem; font-size:13px; color:var(--text-secondary)">
+          Admin login: <strong>admin@servenest.com</strong> / <strong>admin123</strong>
+        </div>
+      </div>
+
+      <!-- ── REGISTER FORM ── -->
+      <div id="register-form" style="display:none">
+
+        <!-- ROLE SELECTOR -->
+        <p style="font-size:13px; font-weight:600; color:var(--text-secondary); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">I am a</p>
+        <div class="role-selector">
+          <div class="role-btn active" id="role-user" onclick="selectRole('user')">
+            <span class="role-icon">🏠</span>User
+          </div>
+          <div class="role-btn" id="role-worker" onclick="selectRole('worker')">
+            <span class="role-icon">🔧</span>Worker
+          </div>
+        </div>
+
+        <!-- COMMON FIELDS -->
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="reg-name" placeholder="Enter your full name">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="reg-email" placeholder="Enter your email">
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" id="reg-phone" placeholder="10-digit mobile number">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="reg-password" placeholder="Create a password">
+        </div>
+
+        <!-- USER FIELDS -->
+        <div id="user-fields">
+          <div class="form-group">
+            <label>Your Location</label>
+            <select id="reg-location">
+              <option value="">Select city</option>
+              <option>Bengaluru</option>
+              <option>Mysuru</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Full Address</label>
+            <input type="text" id="reg-address" placeholder="House no, street, area">
+          </div>
+        </div>
+
+        <!-- WORKER FIELDS -->
+        <div id="worker-fields" style="display:none">
+          <div class="form-group">
+            <label>Your Service / Skill</label>
+            <select id="reg-service">
+              <option value="">Select your skill</option>
+              <option>Plumber</option>
+              <option>Electrician</option>
+              <option>Carpenter</option>
+              <option>Painter</option>
+              <option>Cleaning</option>
+              <option>AC Repair</option>
+              <option>Mason</option>
+              <option>Gardener</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Years of Experience</label>
+            <select id="reg-experience">
+              <option value="">Select experience</option>
+              <option>Less than 1 year</option>
+              <option>1-2 years</option>
+              <option>3-5 years</option>
+              <option>5-8 years</option>
+              <option>8+ years</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Your Location</label>
+            <select id="reg-worker-location">
+              <option value="">Select city</option>
+              <option>Bengaluru</option>
+              <option>Mysuru</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Price per Hour (₹)</label>
+            <input type="number" id="reg-price" placeholder="e.g. 300" min="100" max="2000">
+          </div>
+          <div class="form-group">
+            <label>About Yourself</label>
+            <textarea id="reg-about" placeholder="Describe your skills and experience in 1-2 lines..."></textarea>
+          </div>
+        </div>
+
+        <button class="btn btn-accent" style="width:100%; margin-top:0.5rem" onclick="handleRegister()">
+          Create Account →
+        </button>
+      </div>
+
+      <!-- BACK TO HOME -->
+      <div style="text-align:center; margin-top:1.25rem;">
+        <a href="index.html" style="font-size:13px; color:var(--text-secondary);">← Back to Home</a>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    let selectedRole = "user";
+
+    function switchTab(tab) {
+      document.querySelectorAll(".tab-btn").forEach((b, i) => {
+        b.classList.toggle("active", (tab === "login" && i === 0) || (tab === "register" && i === 1));
+      });
+      document.getElementById("login-form").style.display    = tab === "login"    ? "block" : "none";
+      document.getElementById("register-form").style.display = tab === "register" ? "block" : "none";
+    }
+
+    function selectRole(role) {
+      selectedRole = role;
+      document.getElementById("role-user").classList.toggle("active", role === "user");
+      document.getElementById("role-worker").classList.toggle("active", role === "worker");
+      document.getElementById("user-fields").style.display   = role === "user"   ? "block" : "none";
+      document.getElementById("worker-fields").style.display = role === "worker" ? "block" : "none";
+    }
+
+    function handleLogin() {
+      const email    = document.getElementById("login-email").value.trim();
+      const password = document.getElementById("login-password").value.trim();
+
+      if (!email || !password) { showToast("Please fill in all fields", "error"); return; }
+
+      // Admin check
+      if (email === "admin@servenest.com" && password === "admin123") {
+        setCurrentUser({ id: "admin", name: "Admin", email, role: "admin" });
+        showToast("Welcome Admin!");
+        setTimeout(() => window.location.href = "admin-dashboard.html", 800);
+        return;
+      }
+
+      // Check registered users
+      const users = getUsers();
+      const user  = users.find(u => u.email === email && u.password === password);
+      if (user) {
+        setCurrentUser(user);
+        showToast("Welcome back, " + user.name.split(" ")[0] + "!");
+        setTimeout(() => {
+          if (user.role === "worker") window.location.href = "worker-dashboard.html";
+          else window.location.href = "user-dashboard.html";
+        }, 800);
+        return;
+      }
+
+      showToast("Invalid email or password", "error");
+    }
+
+    function handleRegister() {
+      const name     = document.getElementById("reg-name").value.trim();
+      const email    = document.getElementById("reg-email").value.trim();
+      const phone    = document.getElementById("reg-phone").value.trim();
+      const password = document.getElementById("reg-password").value.trim();
+
+      if (!name || !email || !phone || !password) {
+        showToast("Please fill in all required fields", "error"); return;
+      }
+      if (phone.length !== 10) {
+        showToast("Enter a valid 10-digit phone number", "error"); return;
+      }
+
+      const users = getUsers();
+      if (users.find(u => u.email === email)) {
+        showToast("Email already registered. Please login.", "error"); return;
+      }
+
+      const newUser = {
+        id: generateId(),
+        name, email, phone, password,
+        role: selectedRole,
+        createdAt: new Date().toISOString()
+      };
+
+      if (selectedRole === "user") {
+        const location = document.getElementById("reg-location").value;
+        const address  = document.getElementById("reg-address").value.trim();
+        if (!location) { showToast("Please select your city", "error"); return; }
+        newUser.location = location;
+        newUser.address  = address;
+
+      } else {
+        const service    = document.getElementById("reg-service").value;
+        const experience = document.getElementById("reg-experience").value;
+        const location   = document.getElementById("reg-worker-location").value;
+        const price      = document.getElementById("reg-price").value;
+        const about      = document.getElementById("reg-about").value.trim();
+
+        if (!service || !experience || !location || !price) {
+          showToast("Please fill in all worker details", "error"); return;
+        }
+
+        newUser.service    = service;
+        newUser.experience = experience;
+        newUser.location   = location;
+        newUser.price      = parseInt(price);
+        newUser.about      = about;
+        newUser.available  = true;
+        newUser.rating     = 0;
+        newUser.reviews    = 0;
+
+        // Also add to workers list
+        const workers = getWorkers();
+        workers.push({
+          id:         newUser.id,
+          name:       newUser.name,
+          service:    newUser.service,
+          location:   newUser.location,
+          price:      newUser.price,
+          rating:     0,
+          reviews:    0,
+          experience: newUser.experience,
+          phone:      newUser.phone,
+          about:      newUser.about,
+          available:  true
+        });
+        saveWorkers(workers);
+      }
+
+      users.push(newUser);
+      saveUsers(users);
+      setCurrentUser(newUser);
+
+      showToast("Account created! Welcome " + name.split(" ")[0] + " 🎉");
+      setTimeout(() => {
+        if (selectedRole === "worker") window.location.href = "worker-dashboard.html";
+        else window.location.href = "user-dashboard.html";
+      }, 900);
+    }
+
+    // Auto-redirect if already logged in
+    const existing = getCurrentUser();
+    if (existing) {
+      if (existing.role === "admin")  window.location.href = "admin-dashboard.html";
+      else if (existing.role === "worker") window.location.href = "worker-dashboard.html";
+      else window.location.href = "user-dashboard.html";
+    }
+  </script>
+</body>
+</html>

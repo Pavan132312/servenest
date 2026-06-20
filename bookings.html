@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ServeNest — My Bookings</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <a class="navbar-brand" href="index.html">Serve<span>Nest</span></a>
+    <div class="navbar-links" id="nav-user"></div>
+  </nav>
+
+  <div class="page-container">
+    <div class="page-header">
+      <h2>My Bookings</h2>
+      <p>All your service bookings in one place</p>
+    </div>
+
+    <!-- FILTER TABS -->
+    <div class="tabs" style="max-width:400px; margin-bottom:1.5rem">
+      <button class="tab-btn active" onclick="filterStatus('all', this)">All</button>
+      <button class="tab-btn" onclick="filterStatus('Confirmed', this)">Confirmed</button>
+      <button class="tab-btn" onclick="filterStatus('Completed', this)">Completed</button>
+      <button class="tab-btn" onclick="filterStatus('Cancelled', this)">Cancelled</button>
+    </div>
+
+    <div id="bookings-container"></div>
+  </div>
+
+  <!-- REVIEW MODAL -->
+  <div class="modal-overlay" id="review-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Rate & Review</h3>
+        <button class="modal-close" onclick="closeModal('review-modal')">✕</button>
+      </div>
+      <p style="color:var(--text-secondary); font-size:14px; margin-bottom:1rem">
+        How was your experience with <strong id="review-worker-name"></strong>?
+      </p>
+      <div class="stars" id="star-rating" style="margin-bottom:1rem; justify-content:center;">
+        <span class="star" onclick="setRating(1)">★</span>
+        <span class="star" onclick="setRating(2)">★</span>
+        <span class="star" onclick="setRating(3)">★</span>
+        <span class="star" onclick="setRating(4)">★</span>
+        <span class="star" onclick="setRating(5)">★</span>
+      </div>
+      <div class="form-group">
+        <label>Your Review</label>
+        <textarea id="review-text" rows="3" placeholder="Share your experience..."></textarea>
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="submitReview()">Submit Review</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    let currentUser     = null;
+    let selectedRating  = 0;
+    let selectedBookingId = null;
+    let selectedWorkerId  = null;
+    let currentFilter   = "all";
+
+    window.onload = function () {
+      currentUser = getCurrentUser();
+      if (!currentUser) {
+        window.location.href = "login.html"; return;
+      }
+      loadBookings("all");
+    };
+
+    function filterStatus(status, btn) {
+      currentFilter = status;
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      loadBookings(status);
+    }
+
+    function loadBookings(status) {
+      let bookings = getBookings().filter(b => b.userId === currentUser.id);
+      if (status !== "all") bookings = bookings.filter(b => b.status === status);
+      bookings = bookings.reverse();
+
+      const container = document.getElementById("bookings-container");
+
+      if (!bookings.length) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <span class="icon">📅</span>
+            <p>No ${status === "all" ? "" : status.toLowerCase() + " "}bookings found.</p>
+            <a href="user-dashboard.html" class="btn btn-primary" style="margin-top:1rem">Browse Workers</a>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = bookings.map(b => `
+        <div class="card" style="margin-bottom:1rem">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem;">
+
+            <div style="display:flex; gap:14px; align-items:flex-start; flex:1">
+              <div class="avatar" style="background:${getAvatarColor(b.workerName)};width:48px;height:48px;font-size:18px;flex-shrink:0">
+                ${getInitials(b.workerName)}
+              </div>
+              <div>
+                <div style="font-weight:700; font-size:16px">${b.workerName}</div>
+                <div style="color:var(--primary-light); font-size:13px; font-weight:600; margin-bottom:8px">${b.service}</div>
+                <div style="display:flex; flex-direction:column; gap:5px;">
+                  <span style="font-size:13px; color:var(--text-secondary)">📅 ${formatDate(b.date)} at ${b.time || "—"}</span>
+                  <span style="font-size:13px; color:var(--text-secondary)">📍 ${b.address}</span>
+                  <span style="font-size:13px; color:var(--text-secondary)">🔧 ${b.problem}</span>
+                  <span style="font-size:13px; color:var(--primary); font-weight:600">💰 ₹${b.price}/hr</span>
+                  <span style="font-size:12px; color:var(--text-muted)">Booked on ${formatDate(b.createdAt)}</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end; min-width:120px">
+              <span class="badge ${
+                b.status === 'Confirmed'  ? 'badge-green' :
+                b.status === 'Cancelled'  ? 'badge-red'   :
+                b.status === 'Completed'  ? 'badge-blue'  : 'badge-amber'
+              }" style="font-size:13px; padding:5px 12px">${b.status}</span>
+
+              ${b.status === "Confirmed" && !b.reviewed ? `
+                <button class="btn btn-sm btn-outline" onclick="openReview(${b.id}, '${b.workerName}', ${b.workerId})">
+                  ⭐ Rate Worker
+                </button>` : ""}
+
+              ${b.status === "Confirmed" ? `
+                <button class="btn btn-sm btn-danger" onclick="cancelBooking(${b.id})">
+                  Cancel
+                </button>` : ""}
+
+              ${b.reviewed ? `
+                <span style="font-size:12px; color:var(--accent); font-weight:600">✓ Reviewed</span>` : ""}
+
+              <button class="btn btn-sm btn-outline" onclick="window.location.href='worker-profile.html?id=${b.workerId}'">
+                View Worker
+              </button>
+            </div>
+
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function cancelBooking(bookingId) {
+      if (!confirm("Are you sure you want to cancel this booking?")) return;
+      const bookings = getBookings().map(b =>
+        b.id === bookingId ? {...b, status: "Cancelled"} : b
+      );
+      saveBookings(bookings);
+      showToast("Booking cancelled");
+      loadBookings(currentFilter);
+    }
+
+    function openReview(bookingId, workerName, workerId) {
+      selectedBookingId = bookingId;
+      selectedWorkerId  = workerId;
+      selectedRating    = 0;
+      document.getElementById("review-worker-name").textContent = workerName;
+      document.getElementById("review-text").value = "";
+      document.querySelectorAll(".star").forEach(s => s.classList.remove("filled"));
+      openModal("review-modal");
+    }
+
+    function setRating(r) {
+      selectedRating = r;
+      document.querySelectorAll(".star").forEach((s, i) => {
+        s.classList.toggle("filled", i < r);
+      });
+    }
+
+    function submitReview() {
+      if (!selectedRating) { showToast("Please select a star rating", "error"); return; }
+      const text = document.getElementById("review-text").value.trim();
+      if (!text)  { showToast("Please write a review", "error"); return; }
+
+      const reviews = getReviews();
+      reviews.push({
+        id:        generateId(),
+        workerId:  selectedWorkerId,
+        userId:    currentUser.id,
+        userName:  currentUser.name,
+        rating:    selectedRating,
+        text,
+        createdAt: new Date().toISOString()
+      });
+      saveReviews(reviews);
+
+      // Update worker average rating
+      const workers = getWorkers();
+      const wIdx    = workers.findIndex(w => w.id === selectedWorkerId);
+      if (wIdx !== -1) {
+        const wReviews = reviews.filter(r => r.workerId === selectedWorkerId);
+        const avg      = wReviews.reduce((s, r) => s + r.rating, 0) / wReviews.length;
+        workers[wIdx].rating  = Math.round(avg * 10) / 10;
+        workers[wIdx].reviews = wReviews.length;
+        saveWorkers(workers);
+      }
+
+      // Mark booking as reviewed
+      const bookings = getBookings().map(b =>
+        b.id === selectedBookingId ? {...b, reviewed: true} : b
+      );
+      saveBookings(bookings);
+
+      closeModal("review-modal");
+      showToast("Review submitted! Thank you ⭐");
+      loadBookings(currentFilter);
+    }
+  </script>
+</body>
+</html>

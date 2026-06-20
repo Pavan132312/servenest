@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ServeNest — Find Skilled Workers Near You</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="navbar-brand">Serve<span>Nest</span></div>
+    <div class="navbar-links" id="nav-user">
+      <a href="login.html">Login</a>
+      <a href="login.html" class="btn-nav">Register</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <h1>Find Skilled Workers<br><span>Near You</span></h1>
+    <p>Connect with trusted plumbers, electricians, carpenters, painters and more — right in your neighbourhood.</p>
+
+    <div class="search-bar">
+      <select id="search-service">
+        <option value="">All Services</option>
+        <option>Plumber</option>
+        <option>Electrician</option>
+        <option>Carpenter</option>
+        <option>Painter</option>
+        <option>Cleaning</option>
+        <option>AC Repair</option>
+        <option>Mason</option>
+        <option>Gardener</option>
+      </select>
+      <input type="text" id="search-location" placeholder="Enter your location (e.g. Bengaluru)">
+      <button class="btn btn-primary" onclick="searchWorkers()">🔍 Search</button>
+    </div>
+  </section>
+
+  <!-- SERVICE CATEGORIES -->
+  <section class="services-section">
+    <h2 class="section-title">Browse by Service</h2>
+    <p class="section-subtitle">Tap a category to find available workers instantly</p>
+    <div class="services-grid">
+      <div class="service-card" onclick="goToService('Plumber')">
+        <span class="icon">🔧</span><p>Plumber</p>
+      </div>
+      <div class="service-card" onclick="goToService('Electrician')">
+        <span class="icon">⚡</span><p>Electrician</p>
+      </div>
+      <div class="service-card" onclick="goToService('Carpenter')">
+        <span class="icon">🪚</span><p>Carpenter</p>
+      </div>
+      <div class="service-card" onclick="goToService('Painter')">
+        <span class="icon">🖌️</span><p>Painter</p>
+      </div>
+      <div class="service-card" onclick="goToService('Cleaning')">
+        <span class="icon">🧹</span><p>Cleaning</p>
+      </div>
+      <div class="service-card" onclick="goToService('AC Repair')">
+        <span class="icon">❄️</span><p>AC Repair</p>
+      </div>
+      <div class="service-card" onclick="goToService('Mason')">
+        <span class="icon">🧱</span><p>Mason</p>
+      </div>
+      <div class="service-card" onclick="goToService('Gardener')">
+        <span class="icon">🌿</span><p>Gardener</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section style="background:#fff; padding: 4rem 2rem;">
+    <div style="max-width:1100px; margin:0 auto;">
+      <h2 class="section-title" style="text-align:center">How It Works</h2>
+      <p class="section-subtitle" style="text-align:center">Book a worker in 3 simple steps</p>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap:2rem; margin-top:2rem;">
+        <div style="text-align:center; padding:1.5rem;">
+          <div style="font-size:3rem; margin-bottom:1rem;">🔍</div>
+          <h3 style="font-size:1.1rem; margin-bottom:0.5rem;">Search</h3>
+          <p style="color:var(--text-secondary); font-size:14px;">Search by service type and your location to find available workers nearby.</p>
+        </div>
+        <div style="text-align:center; padding:1.5rem;">
+          <div style="font-size:3rem; margin-bottom:1rem;">👤</div>
+          <h3 style="font-size:1.1rem; margin-bottom:0.5rem;">Choose</h3>
+          <p style="color:var(--text-secondary); font-size:14px;">View worker profiles, ratings and reviews to pick the right person for your job.</p>
+        </div>
+        <div style="text-align:center; padding:1.5rem;">
+          <div style="font-size:3rem; margin-bottom:1rem;">📅</div>
+          <h3 style="font-size:1.1rem; margin-bottom:0.5rem;">Book</h3>
+          <p style="color:var(--text-secondary); font-size:14px;">Book instantly, get confirmation, and rate the worker after the job is done.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURED WORKERS -->
+  <section class="services-section">
+    <h2 class="section-title">Top Rated Workers</h2>
+    <p class="section-subtitle">Highly rated professionals trusted by hundreds of customers</p>
+    <div class="workers-grid" id="featured-workers"></div>
+    <div style="text-align:center; margin-top:2rem;">
+      <a href="user-dashboard.html" class="btn btn-primary btn-lg">View All Workers →</a>
+    </div>
+  </section>
+
+  <!-- WHY LABOURLINK -->
+  <section style="background: var(--primary); color:#fff; padding:4rem 2rem;">
+    <div style="max-width:1100px; margin:0 auto; text-align:center;">
+      <h2 style="font-size:1.8rem; font-weight:800; margin-bottom:0.5rem;">Why ServeNest?</h2>
+      <p style="opacity:0.85; margin-bottom:2.5rem;">We bridge the gap between skilled workers and homeowners across Karnataka</p>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1.5rem;">
+        <div style="background:rgba(255,255,255,0.1); border-radius:var(--radius); padding:1.5rem;">
+          <div style="font-size:2rem; margin-bottom:0.75rem;">✅</div>
+          <h3 style="font-size:15px; margin-bottom:0.5rem;">Verified Workers</h3>
+          <p style="font-size:13px; opacity:0.8;">All workers are verified before listing on our platform.</p>
+        </div>
+        <div style="background:rgba(255,255,255,0.1); border-radius:var(--radius); padding:1.5rem;">
+          <div style="font-size:2rem; margin-bottom:0.75rem;">⭐</div>
+          <h3 style="font-size:15px; margin-bottom:0.5rem;">Rated & Reviewed</h3>
+          <p style="font-size:13px; opacity:0.8;">Real ratings from real customers so you always choose the best.</p>
+        </div>
+        <div style="background:rgba(255,255,255,0.1); border-radius:var(--radius); padding:1.5rem;">
+          <div style="font-size:2rem; margin-bottom:0.75rem;">⚡</div>
+          <h3 style="font-size:15px; margin-bottom:0.5rem;">Instant Booking</h3>
+          <p style="font-size:13px; opacity:0.8;">Book in under 2 minutes. No calls, no waiting.</p>
+        </div>
+        <div style="background:rgba(255,255,255,0.1); border-radius:var(--radius); padding:1.5rem;">
+          <div style="font-size:2rem; margin-bottom:0.75rem;">💰</div>
+          <h3 style="font-size:15px; margin-bottom:0.5rem;">Fair Pricing</h3>
+          <p style="font-size:13px; opacity:0.8;">Transparent prices. No hidden charges. Pay what you see.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section style="padding:3rem 2rem; background:#fff;">
+    <div style="max-width:800px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:2rem; text-align:center;">
+      <div>
+        <div style="font-size:2.5rem; font-weight:800; color:var(--primary);" id="stat-workers">0</div>
+        <div style="color:var(--text-secondary); font-size:14px; margin-top:4px;">Skilled Workers</div>
+      </div>
+      <div>
+        <div style="font-size:2.5rem; font-weight:800; color:var(--accent);" id="stat-bookings">0</div>
+        <div style="color:var(--text-secondary); font-size:14px; margin-top:4px;">Jobs Completed</div>
+      </div>
+      <div>
+        <div style="font-size:2.5rem; font-weight:800; color:var(--warning);">4.6⭐</div>
+        <div style="color:var(--text-secondary); font-size:14px; margin-top:4px;">Average Rating</div>
+      </div>
+      <div>
+        <div style="font-size:2.5rem; font-weight:800; color:var(--primary);">2</div>
+        <div style="color:var(--text-secondary); font-size:14px; margin-top:4px;">Cities Covered</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer style="background:var(--primary-dark); color:rgba(255,255,255,0.75); padding:2rem; text-align:center;">
+    <div style="font-size:18px; font-weight:800; color:#fff; margin-bottom:0.5rem;">Labour<span style="color:#F9CA24">Link</span></div>
+    <p style="font-size:13px;">Connecting skilled workers with homeowners across Karnataka</p>
+    <p style="font-size:12px; margin-top:1rem; opacity:0.5;">© 2024 ServeNest. Built with ❤️ for Bharat.</p>
+  </footer>
+
+  <script src="app.js"></script>
+  <script>
+    function searchWorkers() {
+      const service = document.getElementById("search-service").value;
+      const location = document.getElementById("search-location").value;
+      let url = "user-dashboard.html";
+      const params = [];
+      if (service) params.push("service=" + encodeURIComponent(service));
+      if (location) params.push("location=" + encodeURIComponent(location));
+      if (params.length) url += "?" + params.join("&");
+      window.location.href = url;
+    }
+
+    function goToService(service) {
+      window.location.href = "user-dashboard.html?service=" + encodeURIComponent(service);
+    }
+
+    function renderFeaturedWorkers() {
+      const workers = getWorkers()
+        .filter(w => w.available)
+        .sort((a, b) => b.rating - a.rating)
+        .slice(0, 3);
+
+      const container = document.getElementById("featured-workers");
+      container.innerHTML = workers.map(w => `
+        <div class="worker-card" onclick="window.location.href='worker-profile.html?id=${w.id}'">
+          <div class="worker-card-header">
+            <div class="avatar" style="background:${getAvatarColor(w.name)}">${getInitials(w.name)}</div>
+            <div>
+              <div class="worker-name">${w.name}</div>
+              <div class="worker-service">${w.service}</div>
+            </div>
+          </div>
+          <div class="worker-meta">
+            <span>📍 ${w.location}</span>
+            <span class="rating">★ ${w.rating}</span>
+            <span>🕐 ${w.experience}</span>
+          </div>
+          <div class="worker-card-footer">
+            <div class="price">₹${w.price}<span>/hr</span></div>
+            <span class="badge badge-green">Available</span>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function animateStats() {
+      const workers = getWorkers();
+      const bookings = getBookings();
+      animateCount("stat-workers", workers.length);
+      animateCount("stat-bookings", bookings.length + 120);
+    }
+
+    function animateCount(id, target) {
+      const el = document.getElementById(id);
+      let count = 0;
+      const step = Math.ceil(target / 40);
+      const interval = setInterval(() => {
+        count = Math.min(count + step, target);
+        el.textContent = count + "+";
+        if (count >= target) clearInterval(interval);
+      }, 40);
+    }
+
+    renderFeaturedWorkers();
+    animateStats();
+  </script>
+</body>
+</html>
