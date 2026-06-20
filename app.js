@@ -73,13 +73,13 @@ function setCurrentUser(user) {
 
 function logout() {
   sessionStorage.removeItem("sn_current_user");
-  window.location.href = "index.html";
+  window.location.href = "./index.html";
 }
 
 function requireAuth(role) {
   const user = getCurrentUser();
-  if (!user) { window.location.href = "login.html"; return null; }
-  if (role && user.role !== role) { window.location.href = "index.html"; return null; }
+  if (!user) { window.location.href = "./login.html"; return null; }
+  if (role && user.role !== role) { window.location.href = "./index.html"; return null; }
   return user;
 }
 
